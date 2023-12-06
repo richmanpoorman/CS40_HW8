@@ -1,3 +1,27 @@
 
 .section text
 printDigit:
+        push r1 on stack r2
+        push r4 on stack r2
+        push r3 on stack r2
+        r3 := m[r0][r2 + 3]
+        r5 := r3
+        if (r3 < 10) goto base_case
+        // recursive call
+        r5 := r3 mod 10
+        push r5 on stack r2
+        r5 := r3 - r5
+        r5 := r5 / 10
+        push r5 on stack r2
+        goto printDigit linking r1
+        pop stack r2
+        r1 := 1
+        goto finish_fact
+    base_case:
+        output r5
+        r1 := 1
+    finish_fact:
+        pop r3 off stack r2
+        pop r4 off stack r2
+        pop r5 off stack r2
+        goto r5
