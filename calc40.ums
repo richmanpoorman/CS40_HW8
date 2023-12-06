@@ -1,0 +1,36 @@
+.section init 
+        
+
+.section text
+calculate: // The main function
+        // Special case for ' '
+        // check if digit 
+        // use the jump table
+
+// The different operations
+printValue:
+
+add:
+
+subtract:
+
+multiply:
+
+divide:
+
+or:
+
+and:
+
+changeSign:
+
+complement:
+
+swap:
+
+duplicate:
+
+pop:
+
+clear:
+

@@ -1,0 +1,43 @@
+
+.zero r0
+.temps r6, r7
+
+.section init
+_ustart:
+        
+        r0 := 0
+        r2 := callStack
+        r3 := valueStack
+
+_jumptableStart:
+        m[r0][jumpTable + '\n'] = printValue
+        m[r0][jumpTable + '+']  = add
+        m[r0][jumpTable + '-']  = subtract
+        m[r0][jumpTable + '*']  = multiply
+        m[r0][jumpTable + '/']  = divide
+        m[r0][jumpTable + '|']  = or
+        m[r0][jumpTable + '&']  = and
+        m[r0][jumpTable + 'c']  = changeSign
+        m[r0][jumpTable + '~']  = complement
+        m[r0][jumpTable + 's']  = swap
+        m[r0][jumpTable + 'd']  = duplicate
+        m[r0][jumpTable + 'p']  = pop
+        m[r0][jumpTable + 'z']  = clear
+
+.section text
+        
+        goto mainCall linking r1
+        
+        halt
+
+.section data
+        .space 10000
+callStack:
+
+        .space 10000
+valueStack: 
+.section rodata
+state:
+        .space 1
+jumpTable:
+        .space 255
