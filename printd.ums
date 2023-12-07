@@ -1,5 +1,8 @@
 
 .section text
+using r5
+// maybe I don't need the finish_digits function 
+// ignore
 printDigit:
         push r1 on stack r2
         push r4 on stack r2
@@ -10,17 +13,17 @@ printDigit:
         // recursive call
         r5 := r3 mod 10
         push r5 on stack r2
-        r5 := r3 - r5
         r5 := r5 / 10
         push r5 on stack r2
-        goto printDigit linking r1
+        goto printDigit linking r1 //go to line 19
         pop stack r2
-        r1 := 1
-        goto finish_fact
+        pop r5 off stack r2
+        output r5
+        goto finish_digits
     base_case:
         output r5
-        r1 := 1
-    finish_fact:
+        go to finish_digits
+    finish_digits:
         pop r3 off stack r2
         pop r4 off stack r2
         pop r5 off stack r2
