@@ -6,13 +6,13 @@ jumpTable:
 
 .section init 
 
-        m[r0][state] = r0 // Starts off in waiting mode
+        m[r0][state] = r0 # Starts off in waiting mode
 
         r6 := r0
-invalidReadSetLoop: // Do while loop to 255
+invalidReadSetLoop: # Do while loop to 255
         m[r0][jumpTable + r6] = invalidRead
         r6 := r6 + 1
-        if (r6 != 256) goto invalidReadSetLoop
+        if (r6 != 256) goto invalidReadSetLoop using r4, r5
 
         m[r0][jumpTable + '\n'] = printValue
         m[r0][jumpTable + '+']  = add
@@ -41,42 +41,51 @@ invalidReadSetLoop: // Do while loop to 255
         m[r0][jumpTable + '9']  = entering
 
 .section text
-// Name      : calculate
-// Purpose   : Performs the calculation given
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Will print out to the terminal; 
-//             Needs the stack/value/result register to be correct
-//             Assumes the jump table is set up
-calculate: // The main function
-        push r1 on stack r2     // Saves the return location
-
+# Name      : calculate
+# Purpose   : Performs the calculation given
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Will print out to the terminal; 
+#             Needs the stack/value/result register to be correct
+#             Assumes the jump table is set up
+calculate: # The main function
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
+        r4 := 0
         r5 := input()
-calculateLoop: // The loop to keep going to 
-        if (r5 == -1) goto exitCalcFunction
+        push r4 on stack r2 # Push the r4 value
+calculateLoop: # The loop to keep going to 
+        if (r5 != -1) looping r1
+        pop stack r2 # pop the r4 value
+        goto exitCalcFunction
+looping: 
+        pop r4 off stack r2 # Get back the stored r4 value
         push r5 on stack r2 
         r5 := jumpTable + r5
         goto m[r0][r5] linking r1
         pop stack r2
         r5 := input()
+        push r4 on stack r2 # Push the r4 value
         goto calculateLoop
 
-// The different operations
 
-// Name      : printValue
-// Purpose   : Prints the entire stack out
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Will print out to the terminal; 
-//             Needs the stack/value/result register to be correct
-//             Assumes the jump table is set up
+# The different operations # 
+
+# Name      : printValue
+# Purpose   : Prints the entire stack out
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Will print out to the terminal; 
+#             Needs the stack/value/result register to be correct
+#             Assumes the jump table is set up
 printValue:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
         
         r5 := r2
 printStackCalcLoop:
-        if (r5 == valueStack) goto exitCalcFunction
+        if (r5 == valueStack) goto exitCalcFunction using r1, r4
         r1 := m[r0][valueStack]
         
         push r1 on stack r2
@@ -86,289 +95,308 @@ printStackCalcLoop:
         r5 := r5 + 1
         goto printStackCalcLoop
 
-        // goto exitCalcFunction
+        # goto exitCalcFunction
        
-// Name      : add
-// Purpose   : Adds the top 2 values of the stack 
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : add
+# Purpose   : Adds the top 2 values of the stack 
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 add:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
         
-        pop r1 off stack r3 // Get the top value of the stack 
-        pop r5 off stack r3 // Get the second top value of the stack
+        pop r1 off stack r3 # Get the top value of the stack 
+        pop r5 off stack r3 # Get the second top value of the stack
 
-        r5 := r5 + r1 // add them together 
-        push r5 on stack r3 // Push the added value onto the stack
+        r5 := r5 + r1 # add them together 
+        push r5 on stack r3 # Push the added value onto the stack
 
         goto exitCalcFunction
 
-// Name      : subtract
-// Purpose   : Subtracts the second from the top by the top value in the stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : subtract
+# Purpose   : Subtracts the second from the top by the top value in the stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 subtract:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
         
-        pop r1 off stack r3 // Get the top value of the stack 
-        pop r5 off stack r3 // Get the second top value of the stack
+        pop r1 off stack r3 # Get the top value of the stack 
+        pop r5 off stack r3 # Get the second top value of the stack
 
-        r5 := r5 - r1 // subtracts them  
-        push r5 on stack r3 // Push the subtracted value onto the stack
+        r5 := r5 - r1 # subtracts them  
+        push r5 on stack r3 # Push the subtracted value onto the stack
 
         goto exitCalcFunction
 
-// Name      : multiply
-// Purpose   : Multiplies the top two values of the stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : multiply
+# Purpose   : Multiplies the top two values of the stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 multiply:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
         
-        pop r1 off stack r3 // Get the top value of the stack 
-        pop r5 off stack r3 // Get the second top value of the stack
+        pop r1 off stack r3 # Get the top value of the stack 
+        pop r5 off stack r3 # Get the second top value of the stack
 
-        r5 := r5 * r1 // multiplies them  
-        push r5 on stack r3 // Push the multiplied value onto the stack
+        r5 := r5 * r1 # multiplies them  
+        push r5 on stack r3 # Push the multiplied value onto the stack
 
         goto exitCalcFunction
 
-// Name      : divide
-// Purpose   : Divides the second from the top value by the top value; if 
-//             the top value is 0, then it prints an error message 
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : divide
+# Purpose   : Divides the second from the top value by the top value; if 
+#             the top value is 0, then it prints an error message 
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 divide:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
-        if (m[r0][r3 - 1] != 0) goto divideNoError 
+        r5 := r3 - 1
+        if (m[r0][r5] != 0) goto divideNoError using r1, r4
 
         output "Can not divide by 0"
         goto exitCalcFunction
 divideNoError: 
-        pop r1 off stack r3 // Get the top value of the stack 
-        pop r5 off stack r3 // Get the second top value of the stack
+        pop r1 off stack r3 # Get the top value of the stack 
+        pop r5 off stack r3 # Get the second top value of the stack
 
-        r5 := r5 / r1 // divides them  
-        push r5 on stack r3 // Push the divided value onto the stack
+        r5 := r5 / r1 # divides them  
+        push r5 on stack r3 # Push the divided value onto the stack
 
         goto exitCalcFunction
 
-// Name      : or
-// Purpose   : Bitwise or the top two values of the stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : or
+# Purpose   : Bitwise or the top two values of the stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 or:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
         
-        pop r1 off stack r3 // Get the top value of the stack 
-        pop r5 off stack r3 // Get the second top value of the stack
+        pop r1 off stack r3 # Get the top value of the stack 
+        pop r5 off stack r3 # Get the second top value of the stack
 
-        r5 := r5 | r1 // or them  
-        push r5 on stack r3 // Push the bitwise or value onto the stack
+        r5 := r5 | r1 # or them  
+        push r5 on stack r3 # Push the bitwise or value onto the stack
 
         goto exitCalcFunction
 
-// Name      : and
-// Purpose   : Bitwise and the top two values of the stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : and
+# Purpose   : Bitwise and the top two values of the stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 and:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
         
-        pop r1 off stack r3 // Get the top value of the stack 
-        pop r5 off stack r3 // Get the second top value of the stack
+        pop r1 off stack r3 # Get the top value of the stack 
+        pop r5 off stack r3 # Get the second top value of the stack
 
-        r5 := r5 & r1 // and them  
-        push r5 on stack r3 // Push the bitwise and value onto the stack
+        r5 := r5 & r1 # and them  
+        push r5 on stack r3 # Push the bitwise and value onto the stack
 
         goto exitCalcFunction
 
-// Name      : changeSign
-// Purpose   : Changes the sign of the top value of the stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : changeSign
+# Purpose   : Changes the sign of the top value of the stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 changeSign:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
 
-        pop r5 off stack r3 // Get the top value of the stack 
-        r5 := r0 - r5 // do 0 - r5 to flip the sign  
-        push r5 on stack r3 // Push the changed sign onto the stack
+        pop r5 off stack r3 # Get the top value of the stack 
+        r5 := r0 - r5 # do 0 - r5 to flip the sign  
+        push r5 on stack r3 # Push the changed sign onto the stack
 
         goto exitCalcFunction
 
-// Name      : complement
-// Purpose   : Does bitwise complement of the top value of the stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : complement
+# Purpose   : Does bitwise complement of the top value of the stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 complement:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
 
-        pop r5 off stack r3 // Get the top value of the stack
-        r5 := ~r5 // multiplies them  
-        push r5 on stack r3 // Push the complemented value onto the stack
+        pop r5 off stack r3 # Get the top value of the stack
+        r5 := ~r5 # multiplies them  
+        push r5 on stack r3 # Push the complemented value onto the stack
 
         goto exitCalcFunction
 
-// Name      : swap
-// Purpose   : Swaps the top two values on the value stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : swap
+# Purpose   : Swaps the top two values on the value stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 swap:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
         
-        pop r1 off stack r3 // Get the top value of the stack 
-        pop r5 off stack r3 // Get the second top value of the stack
+        pop r1 off stack r3 # Get the top value of the stack 
+        pop r5 off stack r3 # Get the second top value of the stack
 
-        // Push them on to reverse order
+        # Push them on to reverse order
         push r1 on stack r3 
         push r5 on stack r3 
         
         goto exitCalcFunction
 
-// Name      : duplicate
-// Purpose   : Pushes a copy of the top onto the stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : duplicate
+# Purpose   : Pushes a copy of the top onto the stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 duplicate:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
-
-        push m[r0][r3 - 1] on stack r3 // Pushes the top value of the stack
+        r5 := r3 - 1
+        push m[r0][r5] on stack r3 # Pushes the top value of the stack
 
         goto exitCalcFunction
 
-// Name      : pop
-// Purpose   : Removes the top value of the stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : pop
+# Purpose   : Removes the top value of the stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 pop:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
 
-        pop stack r3 // Pops the top value off
+        pop stack r3 # Pops the top value off
 
         goto exitCalcFunction
 
-// Name      : clear
-// Purpose   : Clears the value stack
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack
+# Name      : clear
+# Purpose   : Clears the value stack
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack
 clear:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         
         r3 := valueStack
 
         goto exitCalcFunction
 
-// Name      : doNothing
-// Purpose   : Does nothing (except exit entering mode)
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Only changes state
+# Name      : doNothing
+# Purpose   : Does nothing (except exit entering mode)
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Only changes state
 doNothing:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
         goto exitCalcFunction
 
 
-// Name      : entering
-// Purpose   : Recieves the inputed number (into r4)
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Adjusts the value stack;
-//             Adjusts the r4 value
+# Name      : entering
+# Purpose   : Recieves the inputed number (into r4)
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Adjusts the value stack;
+#             Adjusts the r4 value
 entering:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterEntering linking r1
         
-        // Gets the character as a number
+        # Gets the character as a number
         r5 := r2 - 2
         r5 := m[r0][r5]
         r5 := r5 - '0'
 
-        // Adds the number to the running total
+        # Adds the number to the running total
         r4 := r4 * 10
         r4 := r4 + r5
 
         goto exitCalcFunction
 
-// Name      : invalidRead
-// Purpose   : Prints out an invalid read message
-// Parameters: The value of the character read 
-// Return    : None 
-// Notes     : Only called when other characters are bad
+# Name      : invalidRead
+# Purpose   : Prints out an invalid read message
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Only called when other characters are bad
 invalidRead:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
         goto enterWaiting linking r1
 
         output "This was not a valid character to be read" 
 
         goto exitCalcFunction
 
-// HELPER FUNCTIONS //
+# HELPER FUNCTIONS #
 
-// Name      : enterWaiting
-// Purpose   : Changes state to waiting (if possible)
-// Parameters: None
-// Return    : None 
-// Notes     : Changes state
+# Name      : enterWaiting
+# Purpose   : Changes state to waiting (if possible)
+# Parameters: None
+# Return    : None 
+# Notes     : Changes state
 enterWaiting:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
 
-        // If already in waiting state, do nothing
-        if (m[r0][state] == 1) goto exitCalcFunction
+        # If already in waiting state, do nothing
+        if (m[r0][state] == 1) goto exitCalcFunction using r1, r5
 
-        // Otherwise, go to the waiting state
+        # Otherwise, go to the waiting state
         push r4 on stack r3
         r4 := 0
         m[r0][state] := 1
 
         goto exitCalcFunction
 
-// Name      : enterEntering
-// Purpose   : Changes state to entering (if possible)
-// Parameters: None
-// Return    : None 
-// Notes     : Changes state
+# Name      : enterEntering
+# Purpose   : Changes state to entering (if possible)
+# Parameters: None
+# Return    : None 
+# Notes     : Changes state
 enterEntering:
-        push r1 on stack r2     // Saves the return location
+        push r1 on stack r2     # Saves the return location
+        push r4 on stack r2     # Saves the r4 value 
 
-        // If already in the entering state, do nothing
-        if (m[r0][state] == r0) goto exitCalcFunction
+        # If already in the entering state, do nothing
+        if (m[r0][state] == r0) goto exitCalcFunction using r1, r5
         
-        // Otherwise, go to the entering state 
+        # Otherwise, go to the entering state 
         r4 := 0
         m[r0][state] := r0
         
         goto exitCalcFunction
 
-// Name      : exitCalcFunction
-// Purpose   : Exits the function back to the calculate function
-// Parameters: None
-// Return    : None 
-// Notes     : Returns 0
+# Name      : exitCalcFunction
+# Purpose   : Exits the function back to the calculate function
+# Parameters: None
+# Return    : None 
+# Notes     : Returns 0
 exitCalcFunction: 
-        pop r5 off stack r2     // Gets back the return location 
+        pop r4 off stack r2     # Gets back the r4 value 
+        pop r5 off stack r2     # Gets back the return location 
         r1 := 0
         goto r5 
