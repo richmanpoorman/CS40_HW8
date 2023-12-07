@@ -1,17 +1,22 @@
-
+.temps r6, r7 
+.zero r0
 .section text
 // maybe I don't need the finish_digits function 
 // ignore
 printDigit:
         push r1 on stack r2
-        output '7'
+        
         push r4 on stack r2
-        output '9'
+        
         push r3 on stack r2
-        output '11'
-        r3 := m[r0][r2 + 3]
-        r5 := r3
-        if (r3 < 10) goto base_case using r5, r4
+        
+        r5 := r2 - 4
+        r3 := m[r0][r5]
+        
+        
+
+        if (r3 <s 10) goto base_case using r5, r4
+        
         // recursive call
         r5 := r3 mod 10
         push r5 on stack r2
@@ -20,11 +25,13 @@ printDigit:
         goto printDigit linking r1 //go to line 19
         pop stack r2
         pop r5 off stack r2
+        r5 := r5 + '0'
         output r5
         goto finish_digits
     base_case:
+        r5 := r5 + '0'
         output r5
-        go to finish_digits
+        goto finish_digits
     finish_digits:
         pop r3 off stack r2
         pop r4 off stack r2
