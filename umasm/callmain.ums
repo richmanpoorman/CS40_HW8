@@ -1,4 +1,7 @@
 
+.zero r0
+.temps r6, r7
+
 .section text
 mainCall:
         goto calculateLoop linking r1

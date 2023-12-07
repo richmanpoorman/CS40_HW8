@@ -1,3 +1,7 @@
+
+.zero r0
+.temps r6, r7
+
 .section rodata
 state:
         .space 1
