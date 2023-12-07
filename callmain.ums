@@ -1,3 +1,5 @@
 
 .section text
 mainCall:
+        goto calculateLoop linking r1
+        halt

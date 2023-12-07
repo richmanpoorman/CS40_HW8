@@ -1,0 +1,18 @@
+.zero r0 
+.temps r6, r7
+
+.section init 
+        r0 := 0        
+
+.section text 
+loop: 
+        r1 := input()
+        if (r1 == -1) goto exitLoop using r4, r5
+        output r1 
+        goto loop
+exitLoop:
+        halt
+
+.section data 
+
+.section rodata 
