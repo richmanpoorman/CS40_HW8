@@ -1,0 +1,7 @@
+.zero r1
+.temps r6, r7 
+Test_print:
+        r6 := 123
+        push r6 on stack r2
+        goto printDigit linking r1 
+        halt

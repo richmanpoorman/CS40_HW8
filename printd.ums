@@ -1,6 +1,5 @@
 
 .section text
-using r5
 // maybe I don't need the finish_digits function 
 // ignore
 printDigit:
@@ -9,7 +8,7 @@ printDigit:
         push r3 on stack r2
         r3 := m[r0][r2 + 3]
         r5 := r3
-        if (r3 < 10) goto base_case
+        if (r3 < 10) goto base_case using r5, r4
         // recursive call
         r5 := r3 mod 10
         push r5 on stack r2
