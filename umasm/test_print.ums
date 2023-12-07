@@ -1,6 +1,10 @@
-.zero r1
+.zero r0
 .temps r6, r7 
 Test_print:
+        .space 10000
+callStack:
+        r0 := 0
+        r2 := callStack
         r6 := 123
         push r6 on stack r2
         goto printDigit linking r1 

@@ -4,8 +4,11 @@
 // ignore
 printDigit:
         push r1 on stack r2
+        output '7'
         push r4 on stack r2
+        output '9'
         push r3 on stack r2
+        output '11'
         r3 := m[r0][r2 + 3]
         r5 := r3
         if (r3 < 10) goto base_case using r5, r4
