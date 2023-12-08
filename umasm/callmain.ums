@@ -12,11 +12,14 @@
 #             Assumes the jump table is set up
 
 mainCall:
+        push r1 on stack r2
         r4 := 0
         r5 := input()
 calculateLoop: # The loop to keep going to 
         if (r5 != -1) goto looping using r1
-        halt
+        pop r5 off stack r2
+        r1 := 0
+        goto r5
 looping: 
         push r5 on stack r2 
         r5 := jumpTable + r5
