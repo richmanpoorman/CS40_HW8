@@ -7,7 +7,6 @@ printDigit:
         push r4 on stack r2
         push r3 on stack r2
         
-        # r5 := r2 + 3
         r3 := m[r0][r2+3]
         if(r3 <s r0) goto check_negative using r5, r4
 
@@ -24,18 +23,20 @@ printDigit:
 
         pop r5 off stack r2
         r5 := r5 + '0'
-        # output "\nRecursive: \n"
         output r5
         goto finish_digits
 
     check_negative:
+        r6 := -2147483648
+        if(r3 == r6) goto most_negative using r5, r4
         output "-"
         r3 := r0 - r3
         goto recursive_call
-
+    most_negative:
+        output r3
+        goto finish_digits
     base_case:
         r3 := r3 + '0'
-        # output "\nBase: \n"
         output r3
         goto finish_digits
     finish_digits:
@@ -43,3 +44,4 @@ printDigit:
         pop r4 off stack r2
         pop r5 off stack r2
         goto r5
+

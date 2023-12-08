@@ -1,0 +1,17 @@
+.zero r0
+.temps r6, r7 
+Test_print:
+        .space 10000
+callStack:
+        r0 := 0
+        r2 := callStack
+        
+negative_num:
+        r3 := -2147483648
+        push r3 on stack r2
+        goto printDigit linking r1 
+        pop stack r2
+        output "\n"
+        goto haltJump using r4
+haltJump:
+        halt
