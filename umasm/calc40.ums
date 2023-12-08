@@ -100,7 +100,7 @@ add:
         
         # Check_stack
         push r4 on stack r2
-        if(r3 >s valueStack - 2) goto print_underflow using r4,r5
+        if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
         
         pop r1 off stack r3 # Get the top value of the stack 
         # r1 := r1 + '0'
@@ -115,18 +115,33 @@ add:
         r1 := 0
         goto r5 
 
-# Name      : print_underflow
+# Name      : print_underflow_1 
 # Purpose   : operations that pop two on stack but the stack < 2
 # Parameters: none 
 # Return    : None 
 # Notes     : print out message then go back to call
-print_underflow:
+print_underflow_1:
+        pop r4 off stack r2
+        output "Stack underflow---expected at least 1 elements"
+        output "\n"
+        pop r5 off stack r2     # Gets back the return location 
+        r1 := 0
+        goto r5 
+
+# Name      : print_underflow_2 
+# Purpose   : operations that pop two on stack but the stack < 2
+# Parameters: none 
+# Return    : None 
+# Notes     : print out message then go back to call
+print_underflow_2:
         pop r4 off stack r2
         output "Stack underflow---expected at least 2 elements"
         output "\n"
         pop r5 off stack r2     # Gets back the return location 
         r1 := 0
         goto r5 
+
+
 
 
 
@@ -142,7 +157,7 @@ subtract:
         goto enterWaiting linking r1
         # Check_stack
         push r4 on stack r2
-        if(r3 >s valueStack - 2) goto print_underflow using r4,r5
+        if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
 
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
@@ -166,7 +181,7 @@ multiply:
         
         # Check_stack
         push r4 on stack r2
-        if(r3 >s valueStack - 2) goto print_underflow using r4,r5
+        if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
 
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
@@ -200,7 +215,7 @@ divide:
 divideNoError: 
         # Check_stack
         push r4 on stack r2 
-        if(r3 >s valueStack - 2) goto print_underflow using r4,r5
+        if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
 
         r5 := r3 + 1
         pop r1 off stack r3 # Get the top value of the stack 
@@ -223,7 +238,9 @@ or:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
-        
+        push r4 on stack r2
+        if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
+        pop r4 off stack r2
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
 
@@ -245,7 +262,9 @@ and:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
-        
+        push r4 on stack r2
+        if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
+        pop r4 off stack r2
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
 
@@ -267,7 +286,10 @@ changeSign:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
-
+        # Check_stack
+        push r4 on stack r2
+        if(r3 >s valueStack - 1) goto print_underflow_1 using r4,r5
+        pop r4 off stack r2
         pop r5 off stack r3 # Get the top value of the stack 
         r5 := r0 - r5 # do 0 - r5 to flip the sign  
         push r5 on stack r3 # Push the changed sign onto the stack
@@ -287,12 +309,15 @@ complement:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
-
+        # Check_stack
+        push r4 on stack r2
+        if(r3 >s valueStack - 1) goto print_underflow_1 using r4,r5
+        pop r4 off stack r2
         pop r5 off stack r3 # Get the top value of the stack
         r5 := ~r5 # multiplies them  
         push r5 on stack r3 # Push the complemented value onto the stack
 
-        
+       
         pop r5 off stack r2     # Gets back the return location 
 
         r1 := 0
@@ -307,7 +332,9 @@ swap:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
-        
+        push r4 on stack r2
+        if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
+        pop r4 off stack r2
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
 
@@ -329,6 +356,9 @@ duplicate:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
+        push r4 on stack r2
+        if(r3 >s valueStack - 1) goto print_underflow_1 using r4,r5
+        pop r4 off stack r2
         r5 := r3
         push m[r0][r5] on stack r3 # Pushes the top value of the stack
 
@@ -347,7 +377,9 @@ popValue:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
-
+        push r4 on stack r2
+        if(r3 >s valueStack - 1) goto print_underflow_1 using r4,r5
+        pop r4 off stack r2
         pop stack r3 # Pops the top value off
 
         
