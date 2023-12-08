@@ -424,7 +424,9 @@ invalidRead:
         
         goto enterWaiting linking r1
 
-        output "This was not a valid character to be read\n" 
+        output "Unknown character \'"
+        output m[r0][r2 + 1]
+        output "\'\n" 
 
         pop r5 off stack r2     # Gets back the return location 
 
