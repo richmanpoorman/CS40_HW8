@@ -199,7 +199,7 @@ divide:
         goto r5 
 divideNoError: 
         # Check_stack
-        push r4 on stack r2
+        push r4 on stack r2 
         if(r3 >s valueStack - 2) goto print_underflow using r4,r5
 
         r5 := r3 + 1
