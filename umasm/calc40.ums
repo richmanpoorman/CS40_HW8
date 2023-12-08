@@ -191,7 +191,7 @@ divide:
         goto enterWaiting linking r1
         if (m[r0][r3] != r0) goto divideNoError using r1
 
-        output "Can not divide by 0\n"
+        output "Division by zero\n"
         
         pop r5 off stack r2     # Gets back the return location 
 
