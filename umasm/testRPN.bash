@@ -5,14 +5,12 @@ TEST_INPUT="Test/Input/"
 TESTS=($(ls $TEST_INPUT*.test))
 
 touch calc40.um
-umasm urt0.ums calc40.ums callmain.ums printd.ums > calc40.um
+umasm urt0.ums calc40.ums printd.ums callmain.ums > calc40.um
 
 for testFull in "${TESTS[@]}"; do
         testNoPrefix=${testFull#$TEST_INPUT}
         test=${testNoPrefix%".test"}
         echo "Test: "$test
-        
-        echo $TEST_INPUT$test.test
 
         touch $TEST_OUTPUT$test.testOut
         touch $TEST_OUTPUT$test.calc40TestsOut
