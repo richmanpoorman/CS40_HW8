@@ -6,7 +6,7 @@
 state:
         .space 1
 jumpTable:
-        .space 255
+        .space 256
 
 .section init 
         m[r0][state] := r0 # Starts off in waiting mode
@@ -98,17 +98,38 @@ add:
         push r1 on stack r2     # Saves the return location
         goto enterWaiting linking r1
         
+        # Check_stack
+        push r4 on stack r2
+        if(r3 >s valueStack - 2) goto print_underflow using r4,r5
+        
         pop r1 off stack r3 # Get the top value of the stack 
+        # r1 := r1 + '0'
+        # output r1
+        # output "that was number"
         pop r5 off stack r3 # Get the second top value of the stack
-
         r5 := r5 + r1 # add them together 
         push r5 on stack r3 # Push the added value onto the stack
 
-        
+        pop r4 off stack r2
         pop r5 off stack r2     # Gets back the return location 
-
         r1 := 0
         goto r5 
+
+# Name      : print_underflow
+# Purpose   : operations that pop two on stack but the stack < 2
+# Parameters: none 
+# Return    : None 
+# Notes     : print out message then go back to call
+print_underflow:
+        pop r4 off stack r2
+        output "Stack underflow---expected at least 2 elements"
+        output "\n"
+        pop r5 off stack r2     # Gets back the return location 
+        r1 := 0
+        goto r5 
+
+
+
 
 # Name      : subtract
 # Purpose   : Subtracts the second from the top by the top value in the stack
@@ -119,13 +140,16 @@ subtract:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
-        
+        # Check_stack
+        push r4 on stack r2
+        if(r3 >s valueStack - 2) goto print_underflow using r4,r5
+
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
 
         r5 := r5 - r1 # subtracts them  
         push r5 on stack r3 # Push the subtracted value onto the stack
-
+        pop r4 off stack r2
         pop r5 off stack r2     # Gets back the return location 
 
         r1 := 0
@@ -140,12 +164,16 @@ multiply:
         push r1 on stack r2     # Saves the return location
         goto enterWaiting linking r1
         
+        # Check_stack
+        push r4 on stack r2
+        if(r3 >s valueStack - 2) goto print_underflow using r4,r5
+
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
 
         r5 := r5 * r1 # multiplies them  
         push r5 on stack r3 # Push the multiplied value onto the stack
-
+        pop r4 off stack r2
         pop r5 off stack r2     # Gets back the return location 
 
         r1 := 0
@@ -161,9 +189,7 @@ divide:
         push r1 on stack r2     # Saves the return location
         
         goto enterWaiting linking r1
-        r5 := r3 + 1
-        
-        if (m[r0][r5] != r0) goto divideNoError using r1
+        if (m[r0][r3] != r0) goto divideNoError using r1
 
         output "Can not divide by 0\n"
         
@@ -172,12 +198,17 @@ divide:
         r1 := 0
         goto r5 
 divideNoError: 
+        # Check_stack
+        push r4 on stack r2
+        if(r3 >s valueStack - 2) goto print_underflow using r4,r5
+
+        r5 := r3 + 1
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
 
         r5 := r5 / r1 # divides them  
         push r5 on stack r3 # Push the divided value onto the stack
-
+        pop r4 off stack r2 
         pop r5 off stack r2     # Gets back the return location 
 
         r1 := 0
