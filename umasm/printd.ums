@@ -7,15 +7,16 @@ printDigit:
         push r4 on stack r2
         push r3 on stack r2
         
-        r5 := r2 + 3
-        r3 := m[r0][r5]
-        goto check_negative linking r1
+        # r5 := r2 + 3
+        r3 := m[r0][r2+3]
+        if(r3 <s r0) goto check_negative using r5, r4
+
+        recursive_call:
         if (r3 <s 10) goto base_case using r5, r4
         
-        // recursive call
         r5 := r3 mod 10
         push r5 on stack r2
-
+        
         r5 := r3 / 10
         push r5 on stack r2
         goto printDigit linking r1 //go to line 19
@@ -26,21 +27,11 @@ printDigit:
         # output "\nRecursive: \n"
         output r5
         goto finish_digits
+
     check_negative:
-        push r1 on stack r2
-        push r4 on stack r2
-        push r3 on stack r2
-        if(r3 <s r0) goto make_postive using r5,r4
-        pop r3 off stack r2
-        pop r4 off stack r2
-        pop r5 off stack r2
-        goto r5
-    make_postive:
+        output "-"
         r3 := r0 - r3
-        pop r3 off stack r2
-        pop r4 off stack r2
-        pop r5 off stack r2
-        goto r5
+        goto recursive_call
 
     base_case:
         r3 := r3 + '0'
