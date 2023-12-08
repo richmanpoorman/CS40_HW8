@@ -5,32 +5,32 @@
 // ignore
 printDigit:
         push r1 on stack r2
-        
         push r4 on stack r2
-        
         push r3 on stack r2
         
-        r5 := r2 - 4
+        r5 := r2 + 3
         r3 := m[r0][r5]
-        
-        
 
         if (r3 <s 10) goto base_case using r5, r4
         
         // recursive call
         r5 := r3 mod 10
         push r5 on stack r2
-        r5 := r5 / 10
+
+        r5 := r3 / 10
         push r5 on stack r2
         goto printDigit linking r1 //go to line 19
         pop stack r2
+
         pop r5 off stack r2
         r5 := r5 + '0'
+        # output "\nRecursive: \n"
         output r5
         goto finish_digits
     base_case:
-        r5 := r5 + '0'
-        output r5
+        r3 := r3 + '0'
+        # output "\nBase: \n"
+        output r3
         goto finish_digits
     finish_digits:
         pop r3 off stack r2

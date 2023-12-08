@@ -5,7 +5,14 @@ Test_print:
 callStack:
         r0 := 0
         r2 := callStack
-        r5 := 67
-        push r5 on stack r2
+        r3 := -100
+loop: 
+        if (r3 == 100) goto haltJump using r4
+        push r3 on stack r2
         goto printDigit linking r1 
+        pop stack r2
+        output "\n"
+        r3 := r3 + 1
+        goto loop
+haltJump:
         halt
