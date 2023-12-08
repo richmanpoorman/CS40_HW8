@@ -3,6 +3,24 @@
 .temps r6, r7
 
 .section text
+# Name      : main
+# Purpose   : Performs the calculation given
+# Parameters: The value of the character read 
+# Return    : None 
+# Notes     : Will print out to the terminal; 
+#             Needs the stack/value/result register to be correct
+#             Assumes the jump table is set up
+
 mainCall:
-        goto calculateLoop linking r1
+        r4 := 0
+        r5 := input()
+calculateLoop: # The loop to keep going to 
+        if (r5 != -1) goto looping using r1
         halt
+looping: 
+        push r5 on stack r2 
+        r5 := jumpTable + r5
+        goto m[r0][r5] linking r1
+        pop stack r2
+        r5 := input()
+        goto calculateLoop

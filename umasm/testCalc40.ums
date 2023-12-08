@@ -1,0 +1,32 @@
+.zero r0
+.temps r6, r7 
+
+.section init 
+        r0 := 0
+        r2 := callStack
+        r3 := valueStack
+.section text
+        # output "Starting the text area\n"
+        r4 := 0
+loopHead:
+        r5 := input()
+        
+        if (r5 == -1) goto haltJump using r1
+
+        push r5 on stack r2 
+        r5 := jumpTable + r5
+        goto m[r0][r5] linking r1
+        pop r5 off stack r2
+        
+
+        goto loopHead
+haltJump:
+        halt 
+        
+.section data
+        .space 10000
+callStack:
+        .space 10000
+valueStack:
+
+.section rodata
