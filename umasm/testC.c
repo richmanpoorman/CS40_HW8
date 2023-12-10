@@ -1,8 +1,8 @@
 #include <stdio.h>
 int main() {
-        FILE *file = fopen("testFile.txt", "r");
+        FILE *file = fopen("Test/Input/allCharactersInput.test", "w");
 
-        while (!feof(file)) {
-                printf("%i ", fgetc(file));
+        for (int i = 0; i < 256; i++) {
+                fprintf(file, "%c\n", i);
         }
 }

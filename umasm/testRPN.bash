@@ -2,10 +2,19 @@
 shopt -s nullglob
 TEST_OUTPUT="Test/Output/"
 TEST_INPUT="Test/Input/"
+NUM_RANDOM_INSTRUCTIONS=100
+
+touch $TEST_INPUT"randomInput.test"
+random-calc40 $NUM_RANDOM_INSTRUCTIONS > $TEST_INPUT"randomInput.test"
+
 TESTS=($(ls $TEST_INPUT*.test))
 
 touch calc40.um
 umasm urt0.ums calc40.ums printd.ums callmain.ums > calc40.um
+
+time calc40-test calc40.um $NUM_RANDOM_INSTRUCTIONS
+
+
 
 for testFull in "${TESTS[@]}"; do
         testNoPrefix=${testFull#$TEST_INPUT}
@@ -35,3 +44,4 @@ for testFull in "${TESTS[@]}"; do
         fi
         rm $TEST_OUTPUT$test.calc40TestsOut
 done 
+
