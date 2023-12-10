@@ -2,7 +2,7 @@
 shopt -s nullglob
 TEST_OUTPUT="Test/Output/"
 TEST_INPUT="Test/Input/"
-NUM_RANDOM_INSTRUCTIONS=100
+NUM_RANDOM_INSTRUCTIONS=1000000
 
 touch $TEST_INPUT"randomInput.test"
 random-calc40 $NUM_RANDOM_INSTRUCTIONS > $TEST_INPUT"randomInput.test"

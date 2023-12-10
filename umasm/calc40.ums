@@ -218,13 +218,33 @@ divide:
         goto r5 
 divideNoError: 
         # Check_stack
-        r5 := r3 + 1
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
 
+        push r3 on stack r2 
+        push r4 on stack r2 
+
+        r3 := 0x80000000 & r1 
+        r4 := r1 xor r5 
+        r4 :=  0x80000000 & r4 
+        push r4 on stack r2
+        if (r3 == r0) goto checkDenominatorSign using r4
+        r1 := r0 - r1 
+checkDenominatorSign: 
+        r3 := 0x80000000 & r5
+        if (r3 == r0) goto afterSignCheck using r4
+        r5 := r0 - r5 
+afterSignCheck:
         r5 := r5 / r1 # divides them  
+        pop r4 off stack r2 
+        if (r4 == r0) goto afterPopOff using r3 
+        r5 := r0 - r5
+afterPopOff: 
+        pop r4 off stack r2 
+        pop r3 off stack r2
+
         push r5 on stack r3 # Push the divided value onto the stack
-        pop r5 off stack r2     # Gets back the return location 
+        pop r5 off stack r2 # Gets back the return location 
 
         r1 := 0
         goto r5 
