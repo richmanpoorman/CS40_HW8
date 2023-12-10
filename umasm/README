@@ -1,0 +1,94 @@
+# CS40_HW8
+
+Partner:
+        Matthew Wong (mwong14)
+        Abdullahi Abdi (aabdi01)
+
+Acknowledgements:
+        TAs: Bill, Trevor, and others
+
+Register Conventions:
+        r0: The zero register (immutable)
+                Holds the value of 0
+        r1: Return address (Turns into the return value)
+                The value to jump back to after a function call
+        r2: Call Stack Pointer (Non-volatile)
+                The address of the current top of the call stack
+        r3: Value Stack Pointer (Non-volatile)
+                The address of the current toop of the values 
+                held by the calculator stack (the values to alter)
+        r4: Non-volatile Register
+                A register that does not change before and after function
+                calls
+                - Mainly used during Entering Mode to keep track of the number
+                  being entered
+        r5: Volatile Register
+                A register that can be used in functions, without being 
+                temporary (in order to have a register for operations that
+                we can control between macros)
+        r6: Temporary Register
+                Register used for macros
+        r7: Temporary Register
+                Register used for macros
+
+        - Note that these are assumptions for what the registers are 
+          before/after function calls, as functions may do pushing/popping
+          to save the value and put the value back at the end 
+        - The main departure from the suggested calling convention is
+          to use r3 as a value stack pointer instead of another non-volatile 
+          register; this was done because the value stack was used so often,
+          that it was pretty much required to be used in most of the functions,
+          so this assumption helped save space (instead of making memory for
+          the stack in the data area)
+
+Calling Conventions:
+        To call a function, push the parameters onto the call stack in reverse
+        order (ie argument 1 will be on top of argument 2), then call the 
+        function using goto (function name) linking r1.
+        Then, to get the return value of the function, it will be in the r1
+        after the function is called. 
+        Finally, it is the caller responsibility to pop the arguments off 
+        of the call stack to use the function. 
+        There were no major deviations from the calling conventions given
+
+Print Module Implementation:
+        To print the value, we do mod 10 to get the last digit, push the 
+        last digit onto the stack, then recursively call the function
+        (with a base case of the value being less than 10), then print
+        the digit on the stack (and pop), allowing us to print using
+        post-order traversal
+
+RPN Value Stack:
+        The stack is represented similarly to the call stack;
+        it is a contiguous segment of memory of 10000 words in 
+        segment 0 (program memory) in the data section, with 
+        the label for the stack being at the bottom (allowing us to
+        use the stack macros given)
+
+Sections:
+        .section init
+                Represents the "set up phase", which sets 
+                all the registers to their assumed values 
+                before any function calls, and sets up
+                the jump table;
+                These would be setting register r0 to 0,
+                r2 to the bottom of the Call Stack and 
+                r3 to the bottom of the Value Stack,
+                and sets the state to "waiting"
+        .section text
+                The main code area; this is where all of
+                our functions are executed, and where all
+                of the calculator functions are called
+                and looped
+        .section data
+                Stores the data and state of the program;
+                The location of the Call Stack, Value Stack, and current state
+        .section rodata
+                Stores any constants, which is just the jump table
+                to go to the different calculator functions
+
+Time Breakdown:
+        Analyzing : 2.5 hours
+        Writing   : 8.5 hours
+        Debugging : 4.0 hours
+

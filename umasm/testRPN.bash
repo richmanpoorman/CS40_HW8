@@ -10,7 +10,7 @@ random-calc40 $NUM_RANDOM_INSTRUCTIONS > $TEST_INPUT"randomInput.test"
 TESTS=($(ls $TEST_INPUT*.test))
 
 touch calc40.um
-umasm urt0.ums calc40.ums printd.ums callmain.ums > calc40.um
+sh compile.sh
 
 time calc40-test calc40.um $NUM_RANDOM_INSTRUCTIONS
 
