@@ -1,0 +1,75 @@
+# Name      : printValue
+# Purpose   : Prints the entire stack
+# Parameters: None
+# Return    : None
+# Contract  : 
+#   - Assumes a valid stack setup
+#   - Expects the jump table to be configured
+#   - Outputs the content of the stack to the terminal
+
+printValue:
+    push r1 on stack r2     # Saves the return location
+    goto enterWaiting linking r1
+    r5 := r3
+loopStackValues:
+    if (r5 == valueStack) goto finishPrintValue using r1
+    r1 := m[r0][r5]
+    output ">>> "
+    push r5 on stack r2 
+    push r1 on stack r2 
+    goto printDigit linking r1
+    pop stack r2
+    pop r5 off stack r2
+    output '\n'
+    r5 := r5 + 1
+    goto loopStackValues
+finishPrintValue:
+    pop r5 off stack r2     # Gets back the return location
+    r1 := 0
+    goto r5 
+
+# Name      : add
+# Purpose   : Adds the top two values of the stack
+# Parameters: None
+# Return    : None
+# Contract  : 
+#   - Expects a minimum stack size of 2
+#   - Adds the top two values on the stack and pushes the result
+
+add:
+    push r1 on stack r2     # Saves the return location
+    goto enterWaiting linking r1
+    push r4 on stack r2
+    if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
+    pop r1 off stack r3 
+    pop r5 off stack r3 
+    r5 := r5 + r1 
+    push r5 on stack r3
+    pop r4 off stack r2
+    pop r5 off stack r2     # Gets back the return location
+    r1 := 0
+    goto r5 
+
+# Name      : subtract
+# Purpose   : Subtracts the second from the top by the top value in the stack
+# Parameters: None
+# Return    : None
+# Contract  : 
+#   - Expects a minimum stack size of 2
+#   - Subtracts the top value from the second top value on the stack
+
+subtract:
+    push r1 on stack r2     # Saves the return location
+    goto enterWaiting linking r1
+    push r4 on stack r2
+    if(r3 >s valueStack - 2) goto print_underflow_2 using r4,r5
+    pop r1 off stack r3 
+    pop r5 off stack r3 
+    r5 := r5 - r1 
+    push r5 on stack r3
+    pop r4 off stack r2
+    pop r5 off stack r2     # Gets back the return location
+    r1 := 0
+    goto r5 
+
+# ... (similar updates for other blocks)

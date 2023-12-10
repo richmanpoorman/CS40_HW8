@@ -1,0 +1,11 @@
+Stack underflow---expected at least 2 elements
+>>> 5
+Unknown character 'b'
+Stack underflow---expected at least 2 elements
+>>> 5
+Unknown character 'b'
+Unknown character 'b'
+Stack underflow---expected at least 2 elements
+>>> 25
+Stack underflow---expected at least 2 elements
+>>> -10
