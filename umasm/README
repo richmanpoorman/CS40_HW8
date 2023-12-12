@@ -40,6 +40,8 @@ Register Conventions:
           that it was pretty much required to be used in most of the functions,
           so this assumption helped save space (instead of making memory for
           the stack in the data area)
+        - Unique: In the callmain we would push r5 onto the stack everytime, 
+        this is due to one case we need it which is in function entering.
 
 Calling Conventions:
         To call a function, push the parameters onto the call stack in reverse
@@ -64,7 +66,9 @@ RPN Value Stack:
         segment 0 (program memory) in the data section, with 
         the label for the stack being at the bottom (allowing us to
         use the stack macros given)
-
+Waiting and Exiting:
+        We have a label called state: that can either be 0 or 1. 0 is waiting
+        and 1 is entering. 
 Sections:
         .section init
                 Represents the "set up phase", which sets 
