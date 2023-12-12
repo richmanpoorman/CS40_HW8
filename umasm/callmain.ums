@@ -4,18 +4,17 @@
 
 .section text
 # Name      : main
-# Purpose   : Performs the calculation given
-# Parameters: The value of the character read 
+# Purpose   : Runs the RPN Calculator
+# Parameters: None
 # Return    : None 
 # Notes     : Will print out to the terminal; 
 #             Needs the stack/value/result register to be correct
 #             Assumes the jump table is set up
-
 mainCall:
         push r1 on stack r2
         r4 := 0
         r5 := input()
-calculateLoop: # The loop to keep going to 
+calculateLoop: # Keeps going until no input
         if (r5 != -1) goto looping using r1
         pop r5 off stack r2
         r1 := 0
