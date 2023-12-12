@@ -60,6 +60,7 @@ Print Module Implementation:
         the digit on the stack (and pop), allowing us to print using
         post-order traversal
 
+Design Choices:
 RPN Value Stack:
         The stack is represented similarly to the call stack;
         it is a contiguous segment of memory of 10000 words in 
