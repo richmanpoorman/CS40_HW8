@@ -13,11 +13,13 @@ jumpTable:
         r1 := r0
         
         
-invalidReadSetLoop: # Do while loop to 255
+invalidReadSetLoop: # Set all 256 characters to an invalid read
         r5 := jumpTable + r1
         m[r0][r5] := invalidRead
         r1 := r1 + 1
         if (r1 != 256) goto invalidReadSetLoop using r4, r5
+
+        # Add all of the functions for the valid functions
         m[r0][jumpTable + '\n'] := printValue
         m[r0][jumpTable + '+']  := add
         m[r0][jumpTable + '-']  := subtract
@@ -51,8 +53,9 @@ invalidReadSetLoop: # Do while loop to 255
 # The different operations # 
 
 # Name      : printValue
-# Purpose   : Prints the entire stack out
-# Parameters: The value of the character read 
+# Purpose   : Prints all of the values on the stack currently, with the top
+#             value being the top of the stack
+# Parameters: None
 # Return    : None 
 # Notes     : Will print out to the terminal; 
 #             Needs the stack/value/result register to be correct
@@ -62,15 +65,13 @@ printValue:
         goto enterWaiting linking r1
 
         r5 := r3
-loopStackValues:
+loopStackValues: # Prints each value in the stack
         if (r5 == valueStack) goto finishPrintValue using r1
-        # output "Looping\n"
+        
         r1 := m[r0][r5]
-        # output "Got the r1 value\n"
 
         output ">>> "
 
-        # output "Calling printDigit\n"
         push r5 on stack r2 
         push r1 on stack r2 
         goto printDigit linking r1
@@ -83,17 +84,19 @@ loopStackValues:
         
         goto loopStackValues
 finishPrintValue:
-        
         pop r5 off stack r2     # Gets back the return location 
 
         r1 := 0
         goto r5 
 
 # Name      : add
-# Purpose   : Adds the top 2 values of the stack 
-# Parameters: The value of the character read 
+# Purpose   : Pops v1 off of the value stack, then pops v2 off of the value
+#             stack, then push v1 + v2 onto the value stack
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 add:
         push r1 on stack r2     # Saves the return location
         goto enterWaiting linking r1
@@ -115,42 +118,14 @@ add:
         r1 := 0
         goto r5 
 
-# Name      : print_underflow_1 
-# Purpose   : operations that pop two on stack but the stack < 2
-# Parameters: none 
-# Return    : None 
-# Notes     : print out message then go back to call
-print_underflow_1:
-        pop r4 off stack r2
-        output "Stack underflow---expected at least 1 element"
-        output "\n"
-        pop r5 off stack r2     # Gets back the return location 
-        r1 := 0
-        goto r5 
-
-# Name      : print_underflow_2 
-# Purpose   : operations that pop two on stack but the stack < 2
-# Parameters: none 
-# Return    : None 
-# Notes     : print out message then go back to call
-print_underflow_2:
-        pop r4 off stack r2
-        output "Stack underflow---expected at least 2 elements"
-        output "\n"
-        pop r5 off stack r2     # Gets back the return location 
-        r1 := 0
-        goto r5 
-
-
-
-
-
-
 # Name      : subtract
-# Purpose   : Subtracts the second from the top by the top value in the stack
-# Parameters: The value of the character read 
+# Purpose   : Pops v1 off of the value stack, then pops v2 off of the value
+#             stack, then pushes v2 - v1 onto the value stack
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 subtract:
         push r1 on stack r2     # Saves the return location
         
@@ -171,10 +146,13 @@ subtract:
         goto r5 
 
 # Name      : multiply
-# Purpose   : Multiplies the top two values of the stack
-# Parameters: The value of the character read 
+# Purpose   : Pops v1 off of the value stack, then pops v2 off of the value 
+#             stack, then pushes v1 * v2 onto the stack (signed multiplication)
+# Parameters: None 
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 multiply:
         push r1 on stack r2     # Saves the return location
         goto enterWaiting linking r1
@@ -195,11 +173,15 @@ multiply:
         goto r5 
 
 # Name      : divide
-# Purpose   : Divides the second from the top value by the top value; if 
-#             the top value is 0, then it prints an error message 
-# Parameters: The value of the character read 
+# Purpose   : Pops value v1 off the value stack, then pops v2 off the value 
+#             stack, and pushes v2 / v1 onto the value stack (signed division)
+# Parameters: None 
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack;
+#             Will print an error and not perform the operation 
+#               if v1 is 0
 divide:
         push r1 on stack r2     # Saves the return location
         
@@ -216,7 +198,7 @@ divide:
 
         r1 := 0
         goto r5 
-divideNoError: 
+divideNoError: # Continue from here if no error was detected
         # Check_stack
         pop r1 off stack r3 # Get the top value of the stack 
         pop r5 off stack r3 # Get the second top value of the stack
@@ -224,22 +206,23 @@ divideNoError:
         push r3 on stack r2 
         push r4 on stack r2 
 
+        # Check the sign
         r3 := 0x80000000 & r1 
         r4 := r1 xor r5 
         r4 :=  0x80000000 & r4 
-        push r4 on stack r2
+        push r4 on stack r2 # Stores the sign of the final result
         if (r3 == r0) goto checkDenominatorSign using r4
         r1 := r0 - r1 
-checkDenominatorSign: 
+checkDenominatorSign: # Assumes by here, numerator is positive
         r3 := 0x80000000 & r5
         if (r3 == r0) goto afterSignCheck using r4
         r5 := r0 - r5 
-afterSignCheck:
-        r5 := r5 / r1 # divides them  
+afterSignCheck: # Assumes by here, denominator is positive
+        r5 := r5 / r1 # Does unsigned division
         pop r4 off stack r2 
         if (r4 == r0) goto afterPopOff using r3 
         r5 := r0 - r5
-afterPopOff: 
+afterPopOff: # Assumes the result (r5) has the correct final sign
         pop r4 off stack r2 
         pop r3 off stack r2
 
@@ -250,10 +233,13 @@ afterPopOff:
         goto r5 
 
 # Name      : or
-# Purpose   : Bitwise or the top two values of the stack
-# Parameters: The value of the character read 
+# Purpose   : Pops v1 off the value stack, then pops v2 off the value stack, 
+#             then pushes v1 | v2 onto the value stack (bitwise or)
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 or:
         push r1 on stack r2     # Saves the return location
         
@@ -274,10 +260,13 @@ or:
         goto r5 
 
 # Name      : and
-# Purpose   : Bitwise and the top two values of the stack
-# Parameters: The value of the character read 
+# Purpose   : Pops v1 off of the value stack, then pops v2 off of the value
+#             stack, then pushes v1 & v2 onto the value stack (bitwise and)
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 and:
         push r1 on stack r2     # Saves the return location
         
@@ -298,10 +287,13 @@ and:
         goto r5 
 
 # Name      : changeSign
-# Purpose   : Changes the sign of the top value of the stack
-# Parameters: The value of the character read 
+# Purpose   : Pops v1 off of the value stack, then pushes -v1 onto the value
+#             stack (turn the value negative/change sign)
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 changeSign:
         push r1 on stack r2     # Saves the return location
         
@@ -321,10 +313,13 @@ changeSign:
         goto r5 
 
 # Name      : complement
-# Purpose   : Does bitwise complement of the top value of the stack
-# Parameters: The value of the character read 
+# Purpose   : Pops v1 off of the value stack, then pushes ~v1 onto the value
+#             stack (bitwise complement)
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 complement:
         push r1 on stack r2     # Saves the return location
         
@@ -344,10 +339,14 @@ complement:
         goto r5 
 
 # Name      : swap
-# Purpose   : Swaps the top two values on the value stack
-# Parameters: The value of the character read 
+# Purpose   : Pops v1 off the value stack, then pops v2 off the value stack, 
+#             then pushes v1 on the value stack, then pushes v2 on the value 
+#             stack (Swaps the position of the top two value stack values)
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 swap:
         push r1 on stack r2     # Saves the return location
         
@@ -368,10 +367,13 @@ swap:
         goto r5 
 
 # Name      : duplicate
-# Purpose   : Pushes a copy of the top onto the stack
-# Parameters: The value of the character read 
+# Purpose   : Pushes a copy of the top of the value stack onto the value stack
+#             (Duplicates the top value)
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 duplicate:
         push r1 on stack r2     # Saves the return location
         
@@ -389,10 +391,12 @@ duplicate:
         goto r5 
 
 # Name      : pop
-# Purpose   : Removes the top value of the stack
-# Parameters: The value of the character read 
+# Purpose   : Removes the top value of the value stack (pops off the value)
+# Parameters: None
 # Return    : None 
-# Notes     : Adjusts the value stack
+# Notes     : Adjusts the value stack;
+#             Will print an error and not perform the operation 
+#               if there are not enough values on the stack
 popValue:
         push r1 on stack r2     # Saves the return location
         
@@ -409,8 +413,8 @@ popValue:
         goto r5 
 
 # Name      : clear
-# Purpose   : Clears the value stack
-# Parameters: The value of the character read 
+# Purpose   : Clears the value stack (Make the value stack empty)
+# Parameters: None
 # Return    : None 
 # Notes     : Adjusts the value stack
 clear:
@@ -426,7 +430,7 @@ clear:
 
 # Name      : doNothing
 # Purpose   : Does nothing (except exit entering mode)
-# Parameters: The value of the character read 
+# Parameters: None
 # Return    : None 
 # Notes     : Only changes state
 doNothing:
@@ -442,10 +446,10 @@ doNothing:
 
 # Name      : entering
 # Purpose   : Recieves the inputed number (into r4)
-# Parameters: The value of the character read 
+# Parameters: (unsigned char) The value of the character read 
 # Return    : None 
 # Notes     : Adjusts the value stack;
-#             Adjusts the r4 value
+#             Adjusts the r4 value (The running total of the inputed value)
 entering:
         push r1 on stack r2     # Saves the return location
         
@@ -467,8 +471,8 @@ entering:
         goto r5 
 
 # Name      : invalidRead
-# Purpose   : Prints out an invalid read message
-# Parameters: The value of the character read 
+# Purpose   : Prints out an invalid read message (Exits entering mode)
+# Parameters: None
 # Return    : None 
 # Notes     : Only called when other characters are bad
 invalidRead:
@@ -487,11 +491,41 @@ invalidRead:
 
 # HELPER FUNCTIONS #
 
+# Name      : print_underflow_1 
+# Purpose   : Prints out the error message for when the value stack has less 
+#             than 1 value on the stack, but the operation requires 1 value
+# Parameters: none 
+# Return    : None 
+# Notes     : print out message then go back to call
+print_underflow_1:
+        pop r4 off stack r2
+        output "Stack underflow---expected at least 1 element"
+        output "\n"
+        pop r5 off stack r2     # Gets back the return location 
+        r1 := 0
+        goto r5 
+
+# Name      : print_underflow_2 
+# Purpose   : Prints out the error message for when the value stack has less 
+#             than 2 values on the stack, but the operation requires 2 values
+# Parameters: none 
+# Return    : None 
+# Notes     : print out message then go back to call
+print_underflow_2:
+        pop r4 off stack r2
+        output "Stack underflow---expected at least 2 elements"
+        output "\n"
+        pop r5 off stack r2     # Gets back the return location 
+        r1 := 0
+        goto r5 
+
 # Name      : enterWaiting
-# Purpose   : Changes state to waiting (if possible)
+# Purpose   : Changes state to waiting, setting the running value (r4) to 0
+#             if the program was in entering mode
 # Parameters: None
 # Return    : None 
-# Notes     : Changes state
+# Notes     : Changes state (The state value in the data section); 
+#             All calculator functions call this except entering
 enterWaiting:
         push r1 on stack r2     # Saves the return location
 
@@ -511,10 +545,12 @@ exitWaitingFunction:
         goto r5 
 
 # Name      : enterEntering
-# Purpose   : Changes state to entering (if possible)
+# Purpose   : Changes state to entering, setting the running value (r4) to 0 
+#             in order to prepare for taking the next possible digits
 # Parameters: None
 # Return    : None 
-# Notes     : Changes state
+# Notes     : Changes state (The state value in the data section); 
+#             Only called by entering
 enterEntering:
         push r1 on stack r2     # Saves the return location
         
